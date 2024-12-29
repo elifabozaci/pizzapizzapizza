@@ -29,7 +29,7 @@
         label {
             font-weight: bold;
         }
-        input, textarea, select, button {
+        input, select, button {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
@@ -81,12 +81,24 @@
             <input type="text" id="store-slogan" placeholder="Enter your store's slogan" required>
         </div>
         <div>
-            <label for="pizza-menu">Create Pizza Menu (Name, Ingredients, Price, Image URL):</label>
-            <textarea id="pizza-menu" placeholder="Example: Margherita, Tomato & Basil, $12.99, https://example.com/margherita.jpg" rows="4" required></textarea>
+            <label for="pizza-count">Number of Pizzas:</label>
+            <select id="pizza-count" required>
+                <option value="">Select number of pizzas</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
         </div>
+        <div id="pizza-fields"></div>
         <div>
-            <label for="drinks-menu">Drinks (Name, Price):</label>
-            <textarea id="drinks-menu" placeholder="Example: Cola, $1.99" rows="2" required></textarea>
+            <label for="drinks-menu">Drinks Menu:</label>
+            <select id="drinks-menu" multiple required>
+                <option value="Cola, $1.99">Cola - $1.99</option>
+                <option value="Lemonade, $2.49">Lemonade - $2.49</option>
+                <option value="Water, $0.99">Water - $0.99</option>
+                <option value="Iced Tea, $2.29">Iced Tea - $2.29</option>
+            </select>
         </div>
         <button type="submit">Generate Store</button>
     </form>
@@ -105,14 +117,76 @@
     </div>
 
     <script>
-        document.getElementById('pizza-form').addEventListener('submit', function(e) {
+        const pizzaForm = document.getElementById('pizza-form');
+        const pizzaCountSelect = document.getElementById('pizza-count');
+        const pizzaFieldsContainer = document.getElementById('pizza-fields');
+
+        const ingredients = [
+            { name: 'Tomato', image: 'https://example.com/tomato.jpg' },
+            { name: 'Cheese', image: 'https://example.com/cheese.jpg' },
+            { name: 'Pepperoni', image: 'https://example.com/pepperoni.jpg' },
+            { name: 'Basil', image: 'https://example.com/basil.jpg' },
+        ];
+
+        pizzaCountSelect.addEventListener('change', function() {
+            const pizzaCount = parseInt(this.value);
+            pizzaFieldsContainer.innerHTML = '';
+
+            for (let i = 1; i <= pizzaCount; i++) {
+                const pizzaDiv = document.createElement('div');
+                pizzaDiv.innerHTML = `
+                    <h3>Pizza ${i}</h3>
+                    <div>
+                        <label for="pizza-name-${i}">Pizza Name:</label>
+                        <input type="text" id="pizza-name-${i}" placeholder="Enter pizza name" required>
+                    </div>
+                    <div>
+                        <label for="pizza-ingredients-${i}">Ingredients:</label>
+                        <select id="pizza-ingredients-${i}" multiple required>
+                            ${ingredients.map(ingredient => `<option value="${ingredient.name}, ${ingredient.image}">${ingredient.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="pizza-price-${i}">Price:</label>
+                        <input type="text" id="pizza-price-${i}" placeholder="Enter pizza price" required>
+                    </div>
+                    <div class="pizza-image-container" id="pizza-image-container-${i}">
+                        <h4>Pizza Image:</h4>
+                        <img id="pizza-image-${i}" src="" alt="Pizza ${i}" style="display: none;">
+                    </div>
+                `;
+                pizzaFieldsContainer.appendChild(pizzaDiv);
+
+                const ingredientsSelect = document.getElementById(`pizza-ingredients-${i}`);
+                ingredientsSelect.addEventListener('change', function() {
+                    const selectedIngredients = Array.from(this.selectedOptions).map(option => option.value.split(', ')[1]);
+                    const pizzaImage = document.getElementById(`pizza-image-${i}`);
+                    if (selectedIngredients.length > 0) {
+                        pizzaImage.src = selectedIngredients[0];
+                        pizzaImage.style.display = 'block';
+                    } else {
+                        pizzaImage.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        pizzaForm.addEventListener('submit', function(e) {
             e.preventDefault(); // Prevent form from reloading the page
-            
+
             // Get user inputs
             const storeName = document.getElementById('store-name').value;
             const storeSlogan = document.getElementById('store-slogan').value;
-            const pizzaMenu = document.getElementById('pizza-menu').value.split('\n');
-            const drinksMenu = document.getElementById('drinks-menu').value.split('\n');
+            const pizzaCount = parseInt(pizzaCountSelect.value);
+            const pizzaMenu = [];
+            for (let i = 1; i <= pizzaCount; i++) {
+                const name = document.getElementById(`pizza-name-${i}`).value;
+                const ingredients = Array.from(document.getElementById(`pizza-ingredients-${i}`).selectedOptions).map(option => option.value.split(', ')[0]).join(', ');
+                const price = document.getElementById(`pizza-price-${i}`).value;
+                const image = document.getElementById(`pizza-image-${i}`).src;
+                pizzaMenu.push({ name, ingredients, price, image });
+            }
+            const drinksMenu = Array.from(document.getElementById('drinks-menu').selectedOptions).map(option => option.value);
 
             // Display store name and slogan
             document.getElementById('output-store-name').textContent = storeName;
@@ -121,15 +195,14 @@
             // Display pizza menu
             const pizzaMenuList = document.getElementById('output-pizza-menu');
             pizzaMenuList.innerHTML = ''; // Clear previous content
-            pizzaMenu.forEach(item => {
-                const [name, ingredients, price, imageUrl] = item.split(',').map(i => i.trim());
+            pizzaMenu.forEach(pizza => {
                 const pizzaItem = document.createElement('div');
                 pizzaItem.className = 'pizza-item';
                 const img = document.createElement('img');
-                img.src = imageUrl || 'https://via.placeholder.com/100'; // Fallback image
-                img.alt = name || 'Pizza';
+                img.src = pizza.image || 'https://via.placeholder.com/100'; // Fallback image
+                img.alt = pizza.name || 'Pizza';
                 const text = document.createElement('div');
-                text.innerHTML = `<strong>${name}</strong><br>${ingredients}<br><em>${price}</em>`;
+                text.innerHTML = `<strong>${pizza.name}</strong><br>${pizza.ingredients}<br><em>${pizza.price}</em>`;
                 pizzaItem.appendChild(img);
                 pizzaItem.appendChild(text);
                 pizzaMenuList.appendChild(pizzaItem);
@@ -138,9 +211,9 @@
             // Display drinks menu
             const drinksMenuList = document.getElementById('output-drinks-menu');
             drinksMenuList.innerHTML = ''; // Clear previous content
-            drinksMenu.forEach(item => {
+            drinksMenu.forEach(drink => {
                 const li = document.createElement('li');
-                li.textContent = item;
+                li.textContent = drink;
                 drinksMenuList.appendChild(li);
             });
 
