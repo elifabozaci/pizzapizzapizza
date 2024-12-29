@@ -109,12 +109,12 @@
         <div class="form-step" data-step="100">
             <div>
                 <label for="drinks-menu">Drinks Menu:</label>
-                <select id="drinks-menu" multiple required>
-                    <option value="Cola, 1.99">Cola - ₺1.99</option>
-                    <option value="Lemonade, 2.49">Lemonade - ₺2.49</option>
-                    <option value="Water, 0.99">Water - ₺0.99</option>
-                    <option value="Iced Tea, 2.29">Iced Tea - ₺2.29</option>
-                </select>
+                <div id="drinks-menu">
+                    <label><input type="checkbox" value="Cola, 1.99"> Cola - ₺1.99</label><br>
+                    <label><input type="checkbox" value="Lemonade, 2.49"> Lemonade - ₺2.49</label><br>
+                    <label><input type="checkbox" value="Water, 0.99"> Water - ₺0.99</label><br>
+                    <label><input type="checkbox" value="Iced Tea, 2.29"> Iced Tea - ₺2.29</label><br>
+                </div>
             </div>
             <button type="button" onclick="prevStep()">Back</button>
             <button type="submit">Generate Store</button>
@@ -148,11 +148,10 @@
 
         function nextStep() {
             currentStep++;
-            showStep(currentStep);
-            if (currentStep === 4) {
+            if (currentStep > 3 && currentStep <= 3 + parseInt(document.getElementById('pizza-count').value)) {
                 generatePizzaFields();
-            } else if (currentStep > 4) {
-                showStep(100);
+            } else {
+                showStep(currentStep);
             }
         }
 
@@ -166,10 +165,9 @@
             const pizzaFieldsContainer = document.getElementById('pizza-fields-container');
             pizzaFieldsContainer.innerHTML = '';
             for (let i = 1; i <= pizzaCount; i++) {
-                let step = 3 + i;
                 const pizzaDiv = document.createElement('div');
                 pizzaDiv.classList.add('form-step');
-                pizzaDiv.setAttribute('data-step', step);
+                pizzaDiv.setAttribute('data-step', 3 + i);
                 pizzaDiv.innerHTML = `
                     <h3>Pizza ${i}</h3>
                     <div>
@@ -235,7 +233,9 @@
                 const image = document.getElementById(`pizza-image-${i}`).src;
                 pizzaMenu.push({ name, ingredients, price, image });
             }
-            const drinksMenu = Array.from(document.getElementById('drinks-menu').selectedOptions).map(option => option.value);
+            const drinksMenu = Array.from(document.querySelectorAll('#drinks-menu input[type="checkbox"]'))
+                .filter(input => input.checked)
+                .map(input => input.value);
 
             // Display store name and slogan
             document.getElementById('output-store-name').textContent = storeName;
