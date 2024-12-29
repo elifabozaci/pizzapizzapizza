@@ -34,7 +34,7 @@
             font-weight: bold;
         }
         input, select, button {
-            width: 90%;
+            width: 100%;
             padding: 8px;
             margin-top: 5px;
             border: 1px solid #ccc;
@@ -94,7 +94,7 @@
     </style>
 </head>
 <body>
-    <h1>Create Your Pizza Store</h1>
+    <h1>Create Your Custom Pizza Store</h1>
     <form id="pizza-form">
         <div class="form-step active" data-step="1">
             <div>
@@ -246,10 +246,6 @@
                         <label for="pizza-price-${i}">Price (₺):</label>
                         <input type="number" id="pizza-price-${i}" placeholder="Enter pizza price" required min="0.01" step="0.01">
                     </div>
-                    <div class="pizza-image-container" id="pizza-image-container-${i}">
-                        <h4>Pizza Image:</h4>
-                        <img id="pizza-image-${i}" src="" alt="Pizza ${i}" style="display: none;">
-                    </div>
                     <div class="button-group">
                         <button type="button" onclick="prevStep()">Back</button>
                         <button type="button" onclick="nextStep()">Next</button>
@@ -278,9 +274,8 @@
                 const ingredients = Array.from(
                     document.querySelectorAll(`#pizza-ingredients-${i} input[type="checkbox"]:checked`)
                 ).map(input => input.value.split(', ')[0]); // Extract ingredient names
-                const image = document.getElementById(`pizza-image-${i}`).src;
 
-                pizzaMenu.push({ name, price: price.toFixed(2), ingredients, image });
+                pizzaMenu.push({ name, price: price.toFixed(2), ingredients });
             }
 
             const drinksMenu = Array.from(
@@ -302,7 +297,7 @@
                 const pizzaItem = document.createElement('div');
                 pizzaItem.className = 'pizza-item';
                 pizzaItem.innerHTML = `
-                    <img src="${pizza.image}" alt="${pizza.name}">
+                    <img src="https://via.placeholder.com/100" alt="${pizza.name}">
                     <div>
                         <h4>${pizza.name} - ₺${pizza.price}</h4>
                         <p>Ingredients: ${pizza.ingredients.join(', ')}</p>
