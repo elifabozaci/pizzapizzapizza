@@ -85,6 +85,12 @@
             width: auto;
             margin: 0;
         }
+        .error {
+            border-color: red;
+        }
+        .error-message {
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -157,7 +163,7 @@
             let isValid = true;
 
             inputs.forEach(input => {
-                if (!input.value) {
+                if (!input.value || (input.type === 'number' && input.value <= 0)) {
                     isValid = false;
                     input.classList.add('error');
                 } else {
@@ -174,6 +180,10 @@
             errorDiv.textContent = message;
 
             const currentStep = document.querySelector('.form-step.active');
+            const existingError = currentStep.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
             currentStep.insertBefore(errorDiv, currentStep.firstChild);
 
             setTimeout(() => errorDiv.remove(), 3000);
@@ -190,7 +200,7 @@
 
         function nextStep() {
             if (!validateStep(currentStep)) {
-                showErrorMessage('Please fill in all required fields');
+                showErrorMessage('Please fill in all required fields with valid values.');
                 return;
             }
 
@@ -234,7 +244,7 @@
                     </div>
                     <div>
                         <label for="pizza-price-${i}">Price (₺):</label>
-                        <input type="number" id="pizza-price-${i}" placeholder="Enter pizza price" required>
+                        <input type="number" id="pizza-price-${i}" placeholder="Enter pizza price" required min="0.01" step="0.01">
                     </div>
                     <div class="pizza-image-container" id="pizza-image-container-${i}">
                         <h4>Pizza Image:</h4>
