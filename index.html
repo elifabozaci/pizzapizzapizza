@@ -23,8 +23,11 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        form div {
-            margin-bottom: 15px;
+        .form-step {
+            display: none;
+        }
+        .form-step.active {
+            display: block;
         }
         label {
             font-weight: bold;
@@ -67,49 +70,54 @@
             border-radius: 8px;
             margin-right: 15px;
         }
-        .pizza-image-container {
-            text-align: center;
-            margin-top: 10px;
-        }
-        .pizza-image-container img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-        }
     </style>
 </head>
 <body>
     <h1>Create Your Custom Pizza Store</h1>
     <form id="pizza-form">
-        <div>
-            <label for="store-name">Store Name:</label>
-            <input type="text" id="store-name" placeholder="Enter your store's name" required>
+        <div class="form-step active" data-step="1">
+            <div>
+                <label for="store-name">Store Name:</label>
+                <input type="text" id="store-name" placeholder="Enter your store's name" required>
+            </div>
+            <button type="button" onclick="nextStep()">Next</button>
         </div>
-        <div>
-            <label for="store-slogan">Store Slogan:</label>
-            <input type="text" id="store-slogan" placeholder="Enter your store's slogan" required>
+        <div class="form-step" data-step="2">
+            <div>
+                <label for="store-slogan">Store Slogan:</label>
+                <input type="text" id="store-slogan" placeholder="Enter your store's slogan" required>
+            </div>
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="button" onclick="nextStep()">Next</button>
         </div>
-        <div>
-            <label for="pizza-count">Number of Pizzas:</label>
-            <select id="pizza-count" required>
-                <option value="">Select number of pizzas</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-            </select>
+        <div class="form-step" data-step="3">
+            <div>
+                <label for="pizza-count">Number of Pizzas:</label>
+                <select id="pizza-count" required>
+                    <option value="">Select number of pizzas</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="button" onclick="nextStep()">Next</button>
         </div>
-        <div id="pizza-fields"></div>
-        <div>
-            <label for="drinks-menu">Drinks Menu:</label>
-            <select id="drinks-menu" multiple required>
-                <option value="Cola, $1.99">Cola - $1.99</option>
-                <option value="Lemonade, $2.49">Lemonade - $2.49</option>
-                <option value="Water, $0.99">Water - $0.99</option>
-                <option value="Iced Tea, $2.29">Iced Tea - $2.29</option>
-            </select>
+        <div id="pizza-fields-container"></div>
+        <div class="form-step" data-step="100">
+            <div>
+                <label for="drinks-menu">Drinks Menu:</label>
+                <select id="drinks-menu" multiple required>
+                    <option value="Cola, $1.99">Cola - $1.99</option>
+                    <option value="Lemonade, $2.49">Lemonade - $2.49</option>
+                    <option value="Water, $0.99">Water - $0.99</option>
+                    <option value="Iced Tea, $2.29">Iced Tea - $2.29</option>
+                </select>
+            </div>
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="submit">Generate Store</button>
         </div>
-        <button type="submit">Generate Store</button>
     </form>
 
     <div id="output" class="output" style="display:none;">
@@ -126,23 +134,39 @@
     </div>
 
     <script>
-        const pizzaForm = document.getElementById('pizza-form');
-        const pizzaCountSelect = document.getElementById('pizza-count');
-        const pizzaFieldsContainer = document.getElementById('pizza-fields');
+        let currentStep = 1;
 
-        const ingredients = [
-            { name: 'Tomato', image: 'https://example.com/tomato.jpg' },
-            { name: 'Cheese', image: 'https://example.com/cheese.jpg' },
-            { name: 'Pepperoni', image: 'https://example.com/pepperoni.jpg' },
-            { name: 'Basil', image: 'https://example.com/basil.jpg' },
-        ];
+        function showStep(step) {
+            document.querySelectorAll('.form-step').forEach(element => {
+                element.classList.remove('active');
+                if (parseInt(element.getAttribute('data-step')) === step) {
+                    element.classList.add('active');
+                }
+            });
+        }
 
-        pizzaCountSelect.addEventListener('change', function() {
-            const pizzaCount = parseInt(this.value);
+        function nextStep() {
+            currentStep++;
+            showStep(currentStep);
+            if (currentStep === 4) {
+                generatePizzaFields();
+            }
+        }
+
+        function prevStep() {
+            currentStep--;
+            showStep(currentStep);
+        }
+
+        function generatePizzaFields() {
+            const pizzaCount = parseInt(document.getElementById('pizza-count').value);
+            const pizzaFieldsContainer = document.getElementById('pizza-fields-container');
             pizzaFieldsContainer.innerHTML = '';
-
             for (let i = 1; i <= pizzaCount; i++) {
+                let step = 3 + i;
                 const pizzaDiv = document.createElement('div');
+                pizzaDiv.classList.add('form-step');
+                pizzaDiv.setAttribute('data-step', step);
                 pizzaDiv.innerHTML = `
                     <h3>Pizza ${i}</h3>
                     <div>
@@ -152,7 +176,10 @@
                     <div>
                         <label for="pizza-ingredients-${i}">Ingredients:</label>
                         <select id="pizza-ingredients-${i}" multiple required>
-                            ${ingredients.map(ingredient => `<option value="${ingredient.name}, ${ingredient.image}">${ingredient.name}</option>`).join('')}
+                            <option value="Tomato, https://example.com/tomato.jpg">Tomato</option>
+                            <option value="Cheese, https://example.com/cheese.jpg">Cheese</option>
+                            <option value="Pepperoni, https://example.com/pepperoni.jpg">Pepperoni</option>
+                            <option value="Basil, https://example.com/basil.jpg">Basil</option>
                         </select>
                     </div>
                     <div>
@@ -163,6 +190,8 @@
                         <h4>Pizza Image:</h4>
                         <img id="pizza-image-${i}" src="" alt="Pizza ${i}" style="display: none;">
                     </div>
+                    <button type="button" onclick="prevStep()">Back</button>
+                    <button type="button" onclick="nextStep()">Next</button>
                 `;
                 pizzaFieldsContainer.appendChild(pizzaDiv);
 
@@ -178,15 +207,16 @@
                     }
                 });
             }
-        });
+            showStep(4);
+        }
 
-        pizzaForm.addEventListener('submit', function(e) {
+        document.getElementById('pizza-form').addEventListener('submit', function(e) {
             e.preventDefault(); // Prevent form from reloading the page
 
             // Get user inputs
             const storeName = document.getElementById('store-name').value;
             const storeSlogan = document.getElementById('store-slogan').value;
-            const pizzaCount = parseInt(pizzaCountSelect.value);
+            const pizzaCount = parseInt(document.getElementById('pizza-count').value);
             const pizzaMenu = [];
             for (let i = 1; i <= pizzaCount; i++) {
                 const name = document.getElementById(`pizza-name-${i}`).value;
