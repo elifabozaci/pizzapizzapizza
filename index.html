@@ -275,7 +275,7 @@
                     });
                 });
             }
-            showStep(4);
+            showStep(3 + pizzaCount);
         }
 
         document.getElementById('pizza-form').addEventListener('submit', function(e) {
@@ -318,13 +318,13 @@
             pizzaMenu.forEach(pizza => {
                 const pizzaItem = document.createElement('div');
                 pizzaItem.className = 'pizza-item';
-                pizzaItem.innerHTML = `
-                    <img src="generatePizzaImage('${pizza.ingredients.join(',')}')" alt="${pizza.name}">
-                    <div>
-                        <h4>${pizza.name} - ₺${pizza.price}</h4>
-                        <p>Ingredients: ${pizza.ingredients.join(', ')}</p>
-                    </div>
-                `;
+                const img = document.createElement('img');
+                img.src = generatePizzaImage(pizza.ingredients);
+                img.alt = pizza.name;
+                pizzaItem.appendChild(img);
+                const textDiv = document.createElement('div');
+                textDiv.innerHTML = `<h4>${pizza.name} - ₺${pizza.price}</h4><p>Ingredients: ${pizza.ingredients.join(', ')}</p>`;
+                pizzaItem.appendChild(textDiv);
                 pizzaMenuDiv.appendChild(pizzaItem);
             });
 
@@ -347,18 +347,37 @@
             canvas.width = 500;
             canvas.height = 500;
 
-            const images = ingredients.split(',');
+            const ingredientUrls = {
+                'anchovies': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/anchovies.png',
+                'bacon': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/bacon.png',
+                'basil leaves': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/basil%20leaves.png',
+                'black olives': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/black%20olives.png',
+                'cheddar cheese': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/cheddar%20cheese.png',
+                'corns': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/corns.png',
+                'crust': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/crust.png',
+                'green olives': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/green%20olives.png',
+                'green pepper': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/green%20pepper.png',
+                'jalapeno': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/jalapeno.png',
+                'mushrooms': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/mushrooms.png',
+                'onions': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/onions.png',
+                'pepperoni': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/pepperoni.png',
+                'pineapple': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/pineapple.png',
+                'pizza sauce': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/pizza%20sauce.png',
+                'salami': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/salami.png',
+                'shrimps': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/shrimps.png',
+                'tomatoes': 'https://raw.githubusercontent.com/elifabozaci/pizzapizzapizza/main/images/tomatoes.png'
+            };
 
             let loadedImages = 0;
-            images.forEach((ingredient, index) => {
+            ingredients.forEach((ingredient, index) => {
                 const img = new Image();
-                img.src = `images/${ingredient.trim()}.png`;
+                img.src = ingredientUrls[ingredient];
                 img.onload = () => {
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     loadedImages++;
-                    if (loadedImages === images.length) {
+                    if (loadedImages === ingredients.length) {
                         const dataURL = canvas.toDataURL();
-                        document.querySelector(`img[src="generatePizzaImage('${ingredients}')"]`).src = dataURL;
+                        document.querySelector(`img[src="generatePizzaImage('${ingredients.join(',')}')"]`).src = dataURL;
                     }
                 };
             });
