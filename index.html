@@ -198,6 +198,8 @@
             const pizzaCount = parseInt(document.getElementById('pizza-count').value);
             if (currentStep > 3 && currentStep <= 3 + pizzaCount) {
                 generatePizzaFields(pizzaCount);
+            } else if (currentStep === 4 + pizzaCount) {
+                showStep(100);
             } else {
                 showStep(currentStep);
             }
