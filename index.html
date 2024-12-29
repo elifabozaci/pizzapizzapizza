@@ -71,6 +71,20 @@
             border-radius: 8px;
             margin-right: 15px;
         }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -109,11 +123,11 @@
         <div class="form-step" data-step="100">
             <div>
                 <label for="drinks-menu">Drinks Menu:</label>
-                <div id="drinks-menu">
-                    <label><input type="checkbox" value="Cola, 1.99"> Cola - ₺1.99</label><br>
-                    <label><input type="checkbox" value="Lemonade, 2.49"> Lemonade - ₺2.49</label><br>
-                    <label><input type="checkbox" value="Water, 0.99"> Water - ₺0.99</label><br>
-                    <label><input type="checkbox" value="Iced Tea, 2.29"> Iced Tea - ₺2.29</label><br>
+                <div id="drinks-menu" class="checkbox-group">
+                    <label><input type="checkbox" value="Cola, 1.99"> Cola - ₺1.99</label>
+                    <label><input type="checkbox" value="Lemonade, 2.49"> Lemonade - ₺2.49</label>
+                    <label><input type="checkbox" value="Water, 0.99"> Water - ₺0.99</label>
+                    <label><input type="checkbox" value="Iced Tea, 2.29"> Iced Tea - ₺2.29</label>
                 </div>
             </div>
             <button type="button" onclick="prevStep()">Back</button>
