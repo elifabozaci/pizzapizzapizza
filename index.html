@@ -71,6 +71,84 @@
             border-radius: 8px;
             margin-right: 15px;
         }
+        .button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+button {
+    flex: 1;
+    min-width: 100px;
+    max-width: 200px;
+    margin: 5px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+input, select {
+    margin: 8px 0 16px 0;
+}
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.success-message {
+    color: #2e7d32;
+    background: #edf7ed;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.error-message {
+    color: #d32f2f;
+    background: #fdeded;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    form {
+        padding: 10px;
+    }
+    
+    .pizza-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .pizza-item img {
+        margin: 0 0 10px 0;
+    }
+}
     </style>
 </head>
 <body>
@@ -137,6 +215,34 @@
     <script>
         let currentStep = 1;
 
+        function validateStep(step) {
+    const currentStepElement = document.querySelector(`.form-step[data-step="${step}"]`);
+    const inputs = currentStepElement.querySelectorAll('input[required], select[required]');
+    let isValid = true;
+    
+    inputs.forEach(input => {
+        if (!input.value) {
+            isValid = false;
+            input.classList.add('error');
+        } else {
+            input.classList.remove('error');
+        }
+    });
+    
+    return isValid;
+}
+
+function showErrorMessage(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = message;
+    
+    const currentStep = document.querySelector('.form-step.active');
+    currentStep.insertBefore(errorDiv, currentStep.firstChild);
+    
+    setTimeout(() => errorDiv.remove(), 3000);
+}
+
         function showStep(step) {
             document.querySelectorAll('.form-step').forEach(element => {
                 element.classList.remove('active');
@@ -147,12 +253,18 @@
         }
 
         function nextStep() {
-            currentStep++;
-            if (currentStep > 3 && currentStep <= 3 + parseInt(document.getElementById('pizza-count').value)) {
-                generatePizzaFields();
-            } else {
-                showStep(currentStep);
-            }
+    if (!validateStep(currentStep)) {
+        showErrorMessage('Please fill in all required fields');
+        return;
+    }
+    
+    currentStep++;
+    if (currentStep > 3 && currentStep <= 3 + parseInt(document.getElementById('pizza-count').value)) {
+        generatePizzaFields();
+    } else {
+        showStep(currentStep);
+    }
+}
         }
 
         function prevStep() {
