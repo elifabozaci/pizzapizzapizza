@@ -319,13 +319,13 @@
                 const pizzaItem = document.createElement('div');
                 pizzaItem.className = 'pizza-item';
                 const img = document.createElement('img');
-                img.src = generatePizzaImage(pizza.ingredients);
                 img.alt = pizza.name;
                 pizzaItem.appendChild(img);
                 const textDiv = document.createElement('div');
                 textDiv.innerHTML = `<h4>${pizza.name} - ₺${pizza.price}</h4><p>Ingredients: ${pizza.ingredients.join(', ')}</p>`;
                 pizzaItem.appendChild(textDiv);
                 pizzaMenuDiv.appendChild(pizzaItem);
+                generatePizzaImage(pizza.ingredients, img);
             });
 
             // Populate drinks menu
@@ -341,7 +341,7 @@
             outputDiv.style.display = 'block';
         });
 
-        function generatePizzaImage(ingredients) {
+        function generatePizzaImage(ingredients, imgElement) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = 500;
@@ -377,12 +377,13 @@
                     loadedImages++;
                     if (loadedImages === ingredients.length) {
                         const dataURL = canvas.toDataURL();
-                        document.querySelector(`img[src="generatePizzaImage('${ingredients.join(',')}')"]`).src = dataURL;
+                        imgElement.src = dataURL;
                     }
                 };
+                img.onerror = () => {
+                    console.error(`Failed to load image for ${ingredient}`);
+                };
             });
-
-            return canvas.toDataURL();
         }
 
         document.getElementById('pizza-count').addEventListener('change', function() {
