@@ -232,12 +232,24 @@
                         <input type="text" id="pizza-name-${i}" placeholder="Enter pizza name" required>
                     </div>
                     <div>
-                        <label>Ingredients:</label>
+                        <label>Ingredients (Choose up to 4):</label>
                         <div id="pizza-ingredients-${i}" class="checkbox-group">
-                            <label><input type="checkbox" value="Tomato"> Tomato</label>
-                            <label><input type="checkbox" value="Cheese"> Cheese</label>
-                            <label><input type="checkbox" value="Pepperoni"> Pepperoni</label>
-                            <label><input type="checkbox" value="Basil"> Basil</label>
+                            <label><input type="checkbox" value="anchovies"> Anchovies</label>
+                            <label><input type="checkbox" value="bacon"> Bacon</label>
+                            <label><input type="checkbox" value="basil leaves"> Basil Leaves</label>
+                            <label><input type="checkbox" value="black olives"> Black Olives</label>
+                            <label><input type="checkbox" value="cheddar cheese"> Cheddar Cheese</label>
+                            <label><input type="checkbox" value="corns"> Corns</label>
+                            <label><input type="checkbox" value="green olives"> Green Olives</label>
+                            <label><input type="checkbox" value="green pepper"> Green Pepper</label>
+                            <label><input type="checkbox" value="jalapeno"> Jalapeno</label>
+                            <label><input type="checkbox" value="mushrooms"> Mushrooms</label>
+                            <label><input type="checkbox" value="onions"> Onions</label>
+                            <label><input type="checkbox" value="pepperoni"> Pepperoni</label>
+                            <label><input type="checkbox" value="pineapple"> Pineapple</label>
+                            <label><input type="checkbox" value="salami"> Salami</label>
+                            <label><input type="checkbox" value="shrimps"> Shrimps</label>
+                            <label><input type="checkbox" value="tomatoes"> Tomatoes</label>
                         </div>
                     </div>
                     <div>
@@ -250,6 +262,18 @@
                     </div>
                 `;
                 pizzaFieldsContainer.appendChild(pizzaDiv);
+
+                const ingredientCheckboxes = document.querySelectorAll(`#pizza-ingredients-${i} input[type="checkbox"]`);
+                ingredientCheckboxes.forEach((checkbox) => {
+                    checkbox.addEventListener('change', function() {
+                        const selectedIngredients = Array.from(ingredientCheckboxes)
+                            .filter(input => input.checked);
+                        if (selectedIngredients.length > 4) {
+                            checkbox.checked = false;
+                            alert('You can select up to 4 ingredients only.');
+                        }
+                    });
+                });
             }
             showStep(4);
         }
@@ -269,9 +293,9 @@
                     alert(`Please enter a valid price for Pizza ${i}`);
                     return;
                 }
-                const ingredients = Array.from(
+                const ingredients = ['crust', 'pizza sauce'].concat(Array.from(
                     document.querySelectorAll(`#pizza-ingredients-${i} input[type="checkbox"]:checked`)
-                ).map(input => input.value); // Extract ingredient names
+                ).map(input => input.value)); // Extract ingredient names
 
                 pizzaMenu.push({ name, price: price.toFixed(2), ingredients });
             }
@@ -295,7 +319,7 @@
                 const pizzaItem = document.createElement('div');
                 pizzaItem.className = 'pizza-item';
                 pizzaItem.innerHTML = `
-                    <img src="https://via.placeholder.com/100" alt="${pizza.name}">
+                    <img src="generatePizzaImage('${pizza.ingredients.join(',')}')" alt="${pizza.name}">
                     <div>
                         <h4>${pizza.name} - ₺${pizza.price}</h4>
                         <p>Ingredients: ${pizza.ingredients.join(', ')}</p>
@@ -316,6 +340,31 @@
             // Show the output section
             outputDiv.style.display = 'block';
         });
+
+        function generatePizzaImage(ingredients) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 500;
+            canvas.height = 500;
+
+            const images = ingredients.split(',');
+
+            let loadedImages = 0;
+            images.forEach((ingredient, index) => {
+                const img = new Image();
+                img.src = `images/${ingredient.trim()}.png`;
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    loadedImages++;
+                    if (loadedImages === images.length) {
+                        const dataURL = canvas.toDataURL();
+                        document.querySelector(`img[src="generatePizzaImage('${ingredients}')"]`).src = dataURL;
+                    }
+                };
+            });
+
+            return canvas.toDataURL();
+        }
 
         document.getElementById('pizza-count').addEventListener('change', function() {
             const pizzaCount = parseInt(document.getElementById('pizza-count').value);
