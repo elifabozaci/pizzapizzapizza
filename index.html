@@ -151,6 +151,8 @@
             showStep(currentStep);
             if (currentStep === 4) {
                 generatePizzaFields();
+            } else if (currentStep > 4) {
+                showStep(100);
             }
         }
 
@@ -175,13 +177,13 @@
                         <input type="text" id="pizza-name-${i}" placeholder="Enter pizza name" required>
                     </div>
                     <div>
-                        <label for="pizza-ingredients-${i}">Ingredients:</label>
-                        <select id="pizza-ingredients-${i}" multiple required>
-                            <option value="Tomato, https://example.com/tomato.jpg">Tomato</option>
-                            <option value="Cheese, https://example.com/cheese.jpg">Cheese</option>
-                            <option value="Pepperoni, https://example.com/pepperoni.jpg">Pepperoni</option>
-                            <option value="Basil, https://example.com/basil.jpg">Basil</option>
-                        </select>
+                        <label>Ingredients:</label>
+                        <div id="pizza-ingredients-${i}">
+                            <label><input type="checkbox" value="Tomato, https://example.com/tomato.jpg"> Tomato</label><br>
+                            <label><input type="checkbox" value="Cheese, https://example.com/cheese.jpg"> Cheese</label><br>
+                            <label><input type="checkbox" value="Pepperoni, https://example.com/pepperoni.jpg"> Pepperoni</label><br>
+                            <label><input type="checkbox" value="Basil, https://example.com/basil.jpg"> Basil</label><br>
+                        </div>
                     </div>
                     <div>
                         <label for="pizza-price-${i}">Price (₺):</label>
@@ -196,16 +198,20 @@
                 `;
                 pizzaFieldsContainer.appendChild(pizzaDiv);
 
-                const ingredientsSelect = document.getElementById(`pizza-ingredients-${i}`);
-                ingredientsSelect.addEventListener('change', function() {
-                    const selectedIngredients = Array.from(this.selectedOptions).map(option => option.value.split(', ')[1]);
-                    const pizzaImage = document.getElementById(`pizza-image-${i}`);
-                    if (selectedIngredients.length > 0) {
-                        pizzaImage.src = selectedIngredients[0];
-                        pizzaImage.style.display = 'block';
-                    } else {
-                        pizzaImage.style.display = 'none';
-                    }
+                const ingredientCheckboxes = document.querySelectorAll(`#pizza-ingredients-${i} input[type="checkbox"]`);
+                ingredientCheckboxes.forEach((checkbox) => {
+                    checkbox.addEventListener('change', function() {
+                        const selectedIngredients = Array.from(ingredientCheckboxes)
+                            .filter(input => input.checked)
+                            .map(input => input.value.split(', ')[1]);
+                        const pizzaImage = document.getElementById(`pizza-image-${i}`);
+                        if (selectedIngredients.length > 0) {
+                            pizzaImage.src = selectedIngredients[0];
+                            pizzaImage.style.display = 'block';
+                        } else {
+                            pizzaImage.style.display = 'none';
+                        }
+                    });
                 });
             }
             showStep(4);
@@ -221,7 +227,10 @@
             const pizzaMenu = [];
             for (let i = 1; i <= pizzaCount; i++) {
                 const name = document.getElementById(`pizza-name-${i}`).value;
-                const ingredients = Array.from(document.getElementById(`pizza-ingredients-${i}`).selectedOptions).map(option => option.value.split(', ')[0]).join(', ');
+                const ingredients = Array.from(document.querySelectorAll(`#pizza-ingredients-${i} input[type="checkbox"]`))
+                    .filter(input => input.checked)
+                    .map(input => input.value.split(', ')[0])
+                    .join(', ');
                 const price = document.getElementById(`pizza-price-${i}`).value;
                 const image = document.getElementById(`pizza-image-${i}`).src;
                 pizzaMenu.push({ name, ingredients, price, image });
