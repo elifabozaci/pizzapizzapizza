@@ -256,22 +256,6 @@
                     </div>
                 `;
                 pizzaFieldsContainer.appendChild(pizzaDiv);
-
-                const ingredientCheckboxes = document.querySelectorAll(`#pizza-ingredients-${i} input[type="checkbox"]`);
-                ingredientCheckboxes.forEach((checkbox) => {
-                    checkbox.addEventListener('change', function() {
-                        const selectedIngredients = Array.from(ingredientCheckboxes)
-                            .filter(input => input.checked)
-                            .map(input => input.value.split(', ')[1]);
-                        const pizzaImage = document.getElementById(`pizza-image-${i}`);
-                        if (selectedIngredients.length > 0) {
-                            pizzaImage.src = selectedIngredients[0];
-                            pizzaImage.style.display = 'block';
-                        } else {
-                            pizzaImage.style.display = 'none';
-                        }
-                    });
-                });
             }
             showStep(4);
         }
@@ -286,49 +270,58 @@
             const pizzaMenu = [];
             for (let i = 1; i <= pizzaCount; i++) {
                 const name = document.getElementById(`pizza-name-${i}`).value;
-                const ingredients = Array.from(document.querySelectorAll(`#pizza-ingredients-${i} input[type="checkbox"]`))
-                    .filter(input => input.checked)
-                    .map(input => input.value.split(', ')[0])
-                    .join(', ');
-                const price = document.getElementById(`pizza-price-${i}`).value;
+                const price = parseFloat(document.getElementById(`pizza-price-${i}`).value);
+                if (isNaN(price) || price <= 0) {
+                    alert(`Please enter a valid price for Pizza ${i}`);
+                    return;
+                }
+                const ingredients = Array.from(
+                    document.querySelectorAll(`#pizza-ingredients-${i} input[type="checkbox"]:checked`)
+                ).map(input => input.value.split(', ')[0]); // Extract ingredient names
                 const image = document.getElementById(`pizza-image-${i}`).src;
-                pizzaMenu.push({ name, ingredients, price, image });
-            }
-            const drinksMenu = Array.from(document.querySelectorAll('#drinks-menu input[type="checkbox"]'))
-                .filter(input => input.checked)
-                .map(input => input.value);
 
-            // Display store name and slogan
+                pizzaMenu.push({ name, price: price.toFixed(2), ingredients, image });
+            }
+
+            const drinksMenu = Array.from(
+                document.querySelectorAll('#drinks-menu input[type="checkbox"]:checked')
+            ).map(input => {
+                const [name, price] = input.value.split(', ');
+                return { name, price: parseFloat(price).toFixed(2) };
+            });
+
+            // Populate output
+            const outputDiv = document.getElementById('output');
             document.getElementById('output-store-name').textContent = storeName;
             document.getElementById('output-store-slogan').textContent = storeSlogan;
 
-            // Display pizza menu
-            const pizzaMenuList = document.getElementById('output-pizza-menu');
-            pizzaMenuList.innerHTML = ''; // Clear previous content
+            // Populate pizza menu
+            const pizzaMenuDiv = document.getElementById('output-pizza-menu');
+            pizzaMenuDiv.innerHTML = '';
             pizzaMenu.forEach(pizza => {
                 const pizzaItem = document.createElement('div');
                 pizzaItem.className = 'pizza-item';
-                const img = document.createElement('img');
-                img.src = pizza.image || 'https://via.placeholder.com/100'; // Fallback image
-                img.alt = pizza.name || 'Pizza';
-                const text = document.createElement('div');
-                text.innerHTML = `<strong>${pizza.name}</strong><br>${pizza.ingredients}<br><em>₺${pizza.price}</em>`;
-                pizzaItem.appendChild(img);
-                pizzaItem.appendChild(text);
-                pizzaMenuList.appendChild(pizzaItem);
+                pizzaItem.innerHTML = `
+                    <img src="${pizza.image}" alt="${pizza.name}">
+                    <div>
+                        <h4>${pizza.name} - ₺${pizza.price}</h4>
+                        <p>Ingredients: ${pizza.ingredients.join(', ')}</p>
+                    </div>
+                `;
+                pizzaMenuDiv.appendChild(pizzaItem);
             });
 
-            // Display drinks menu
+            // Populate drinks menu
             const drinksMenuList = document.getElementById('output-drinks-menu');
-            drinksMenuList.innerHTML = ''; // Clear previous content
+            drinksMenuList.innerHTML = '';
             drinksMenu.forEach(drink => {
-                const li = document.createElement('li');
-                li.textContent = drink.replace(',', ' - ₺');
-                drinksMenuList.appendChild(li);
+                const drinkItem = document.createElement('li');
+                drinkItem.textContent = `${drink.name} - ₺${drink.price}`;
+                drinksMenuList.appendChild(drinkItem);
             });
 
             // Show the output section
-            document.getElementById('output').style.display = 'block';
+            outputDiv.style.display = 'block';
         });
     </script>
 </body>
