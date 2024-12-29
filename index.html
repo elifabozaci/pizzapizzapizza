@@ -185,8 +185,6 @@
                 existingError.remove();
             }
             currentStep.insertBefore(errorDiv, currentStep.firstChild);
-
-            setTimeout(() => errorDiv.remove(), 3000);
         }
 
         function showStep(step) {
@@ -207,7 +205,7 @@
             currentStep++;
             const pizzaCount = parseInt(document.getElementById('pizza-count').value);
             if (currentStep > 3 && currentStep <= 3 + pizzaCount) {
-                generatePizzaFields(pizzaCount);
+                showStep(currentStep);
             } else if (currentStep === 4 + pizzaCount) {
                 showStep(100);
             } else {
@@ -236,10 +234,10 @@
                     <div>
                         <label>Ingredients:</label>
                         <div id="pizza-ingredients-${i}" class="checkbox-group">
-                            <label><input type="checkbox" value="Tomato, https://example.com/tomato.jpg"> Tomato</label>
-                            <label><input type="checkbox" value="Cheese, https://example.com/cheese.jpg"> Cheese</label>
-                            <label><input type="checkbox" value="Pepperoni, https://example.com/pepperoni.jpg"> Pepperoni</label>
-                            <label><input type="checkbox" value="Basil, https://example.com/basil.jpg"> Basil</label>
+                            <label><input type="checkbox" value="Tomato"> Tomato</label>
+                            <label><input type="checkbox" value="Cheese"> Cheese</label>
+                            <label><input type="checkbox" value="Pepperoni"> Pepperoni</label>
+                            <label><input type="checkbox" value="Basil"> Basil</label>
                         </div>
                     </div>
                     <div>
@@ -273,7 +271,7 @@
                 }
                 const ingredients = Array.from(
                     document.querySelectorAll(`#pizza-ingredients-${i} input[type="checkbox"]:checked`)
-                ).map(input => input.value.split(', ')[0]); // Extract ingredient names
+                ).map(input => input.value); // Extract ingredient names
 
                 pizzaMenu.push({ name, price: price.toFixed(2), ingredients });
             }
@@ -317,6 +315,11 @@
 
             // Show the output section
             outputDiv.style.display = 'block';
+        });
+
+        document.getElementById('pizza-count').addEventListener('change', function() {
+            const pizzaCount = parseInt(document.getElementById('pizza-count').value);
+            generatePizzaFields(pizzaCount);
         });
     </script>
 </body>
